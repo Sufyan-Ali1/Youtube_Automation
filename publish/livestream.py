@@ -90,7 +90,12 @@ def get_broadcast(broadcast_id: str) -> BroadcastRef:
     )
 
 
-def find_reusable_broadcast(*, title: str, start_time: str | datetime | None) -> BroadcastRef | None:
+def find_reusable_broadcast(
+    *,
+    title: str,
+    start_time: str | datetime | None,
+    include_completed: bool = False,
+) -> BroadcastRef | None:
     scheduled = _iso8601(start_time)
     try:
         scheduled_dt = datetime.fromisoformat(scheduled.replace("Z", "+00:00")).astimezone(timezone.utc)
@@ -112,6 +117,9 @@ def find_reusable_broadcast(*, title: str, start_time: str | datetime | None) ->
         item_title = ((item.get("snippet") or {}).get("title") or "").strip()
         if item_title != title:
             continue
+        life_cycle_status = ((item.get("status") or {}).get("lifeCycleStatus") or "").lower()
+        if life_cycle_status == "complete" and not include_completed:
+            continue
         raw_start = (item.get("snippet") or {}).get("scheduledStartTime") or ""
         try:
             item_start = datetime.fromisoformat(raw_start.replace("Z", "+00:00")).astimezone(timezone.utc)
@@ -122,7 +130,7 @@ def find_reusable_broadcast(*, title: str, start_time: str | datetime | None) ->
         return BroadcastRef(
             broadcast_id=item["id"],
             bound_stream_id=(item.get("contentDetails") or {}).get("boundStreamId"),
-            life_cycle_status=((item.get("status") or {}).get("lifeCycleStatus") or "").lower(),
+            life_cycle_status=life_cycle_status,
             stream_status=((item.get("status") or {}).get("streamStatus") or "").lower() or None,
             title=item_title,
         )

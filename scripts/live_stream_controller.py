@@ -174,6 +174,18 @@ def _transition_live(state: ControllerState) -> ControllerState:
     status = stream_health()
     if status not in {"active", "ready"}:
         raise LiveStreamError(f"YouTube stream is not ingesting yet (stream status={status})")
+    details = get_broadcast(state.broadcast_id)
+    if details.life_cycle_status == "live":
+        state.live_started = True
+        _save_state(state)
+        return state
+    if details.life_cycle_status == "testing":
+        transition_broadcast(state.broadcast_id, "live")
+        state.live_started = True
+        _save_state(state)
+        return state
+    if details.life_cycle_status == "complete":
+        raise LiveStreamError(f"Broadcast {state.broadcast_id} is already complete and cannot transition to live")
     try:
         transition_broadcast(state.broadcast_id, "testing")
     except Exception as exc:
