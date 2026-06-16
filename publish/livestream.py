@@ -95,7 +95,6 @@ def find_reusable_broadcast(*, title: str, start_time: str | datetime | None) ->
             broadcastStatus="all",
             broadcastType="event",
             maxResults=25,
-            mine=True,
         )
         .execute()
     )
