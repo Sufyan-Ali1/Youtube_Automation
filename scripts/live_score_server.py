@@ -343,6 +343,7 @@ _SCOREBOARD_HTML = r"""
       top: 6px;
       transform: translateX(-50%);
       width: 100%;
+      max-width: 720px;
       text-align: center;
       pointer-events: none;
     }
@@ -388,7 +389,7 @@ _SCOREBOARD_HTML = r"""
     }
     .status-box {
       position: absolute;
-      right: -10px;
+      right: 0;
       top: 6px;
       display: flex;
       flex-direction: column;
@@ -470,6 +471,7 @@ _SCOREBOARD_HTML = r"""
       overflow: hidden;
       text-overflow: clip;
       width: 100%;
+      padding: 0 6px;
     }
     .center-score {
       text-align: center;
@@ -550,7 +552,7 @@ _SCOREBOARD_HTML = r"""
     }
     .events-card {
       width: 960px;
-      min-height: 176px;
+      height: 308px;
       margin: 14px auto 0;
       border-top-color: rgba(255,45,45,.98);
       border-bottom-color: rgba(255,45,45,.98);
@@ -667,8 +669,8 @@ _SCOREBOARD_HTML = r"""
     .minute { color: var(--accent); font-weight: 800; }
     .empty-line { color: var(--muted); }
     .events-body {
-      min-height: 118px;
-      padding: 4px 24px 16px 42px;
+      height: 238px;
+      padding: 4px 24px 8px 42px;
       display: grid;
       gap: 0;
       align-content: start;
@@ -679,7 +681,7 @@ _SCOREBOARD_HTML = r"""
       grid-template-columns: 52px 88px 1fr;
       gap: 12px;
       align-items: center;
-      padding: 9px 0;
+      padding: 8px 0;
       border-top: 1px solid rgba(255,255,255,.12);
       font-size: 22px;
     }
@@ -1030,7 +1032,7 @@ _SCOREBOARD_HTML = r"""
         if (!el) return lowest;
         let size = 72;
         el.style.fontSize = `${size}px`;
-        while (el.scrollWidth > el.clientWidth && size > 42) {
+        while (el.scrollWidth > el.clientWidth && size > 28) {
           size -= 2;
           el.style.fontSize = `${size}px`;
         }
@@ -1041,6 +1043,25 @@ _SCOREBOARD_HTML = r"""
         const el = document.getElementById(id);
         if (el) el.style.fontSize = `${minSize}px`;
       });
+    }
+
+    function fitHeaderTitle() {
+      const topbar = document.querySelector('.topbar');
+      const brand = document.querySelector('.brand');
+      const statusBox = document.querySelector('.status-box');
+      const titleWrap = document.querySelector('.title-wrap');
+      const title = document.querySelector('.title');
+      if (!topbar || !brand || !statusBox || !titleWrap || !title) return;
+
+      const available = Math.max(420, topbar.clientWidth - brand.offsetWidth - statusBox.offsetWidth - 40);
+      titleWrap.style.maxWidth = `${available}px`;
+
+      let size = 72;
+      title.style.fontSize = `${size}px`;
+      while (title.scrollWidth > titleWrap.clientWidth && size > 42) {
+        size -= 2;
+        title.style.fontSize = `${size}px`;
+      }
     }
 
     function fitMetaLine() {
@@ -1300,6 +1321,7 @@ _SCOREBOARD_HTML = r"""
       setText('roundLine', topGroup);
       setText('venueLine', venue || 'Venue TBC');
       fitMetaLine();
+      fitHeaderTitle();
       setText('phaseChip', phaseText(fixture.status));
       setText('liveLabel', topBadgeText(fixture.status));
       document.getElementById('phaseChip').classList.toggle('is-finished', isFinishedStatus(fixture.status));
@@ -1341,9 +1363,11 @@ _SCOREBOARD_HTML = r"""
     setupVisiblePanels();
     refresh();
     fitViewport();
+    fitHeaderTitle();
     setInterval(refresh, pollMs);
     setInterval(tickClock, 1000);
     window.addEventListener('resize', fitViewport);
+    window.addEventListener('resize', fitHeaderTitle);
   </script>
 </body>
 </html>
