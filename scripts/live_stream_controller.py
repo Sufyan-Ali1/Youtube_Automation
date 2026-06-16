@@ -145,11 +145,20 @@ def _load_today_fixtures() -> list[dict[str, Any]]:
 
 def _ensure_broadcast(state: ControllerState | None, fixture: dict[str, Any]) -> ControllerState:
     if state and state.fixture_id == fixture["id"] and state.broadcast_id:
-        return state
+        try:
+            current = get_broadcast(state.broadcast_id)
+        except Exception:
+            current = None
+        if current and current.life_cycle_status != "complete":
+            return state
 
     title = _fixture_title(fixture)
     start_time = _parse_match_time(fixture["date"]) or datetime.now(UTC)
     broadcast = find_reusable_broadcast(title=title, start_time=start_time)
+    if broadcast is not None:
+        details = get_broadcast(broadcast.broadcast_id)
+        if details.life_cycle_status == "complete":
+            broadcast = None
     if broadcast is None:
         broadcast = create_broadcast(
             title=title,
