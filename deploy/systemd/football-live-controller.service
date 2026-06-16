@@ -1,0 +1,17 @@
+[Unit]
+Description=Football AutoNews YouTube livestream controller
+After=network.target football-frame.service
+Requires=football-frame.service
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/opt/football-autonews
+EnvironmentFile=/opt/football-autonews/.env
+ExecStart=/opt/football-autonews/venv/bin/python /opt/football-autonews/scripts/live_stream_controller.py
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

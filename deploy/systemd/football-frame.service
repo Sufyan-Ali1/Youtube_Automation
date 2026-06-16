@@ -1,0 +1,16 @@
+[Unit]
+Description=Football AutoNews live frame server
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/opt/football-autonews
+EnvironmentFile=/opt/football-autonews/.env
+ExecStart=/opt/football-autonews/venv/bin/python /opt/football-autonews/scripts/live_score_server.py --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

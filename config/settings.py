@@ -38,9 +38,46 @@ GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 # ── YouTube ───────────────────────────────────────────────────────────────────
 YOUTUBE_REFRESH_TOKEN = os.environ.get("YOUTUBE_REFRESH_TOKEN", "")
 YOUTUBE_PLAYLIST_ID   = os.environ.get("YOUTUBE_PLAYLIST_ID", "")
+YOUTUBE_LIVE_STREAM_ID = os.environ.get("YOUTUBE_LIVE_STREAM_ID", "")
+YOUTUBE_LIVE_PRIVACY_STATUS = os.environ.get("YOUTUBE_LIVE_PRIVACY_STATUS", "unlisted")
+YOUTUBE_LIVE_CATEGORY_ID = os.environ.get("YOUTUBE_LIVE_CATEGORY_ID", "17")
 
 # ── Buffer (future — social posting) ─────────────────────────────────────────
 BUFFER_ACCESS_TOKEN        = os.environ.get("BUFFER_ACCESS_TOKEN", "")
+
+# API-Football / API-Sports (live score scoreboard)
+API_FOOTBALL_KEY        = os.environ.get("API_FOOTBALL_KEY", "")
+API_FOOTBALL_BASE_URL   = os.environ.get("API_FOOTBALL_BASE_URL", "https://v3.football.api-sports.io")
+LIVE_SCORE_POLL_SECONDS = int(os.environ.get("LIVE_SCORE_POLL_SECONDS", "30"))
+LIVE_SCORE_TIMEZONE     = os.environ.get("LIVE_SCORE_TIMEZONE", "UTC")
+
+# ── Livestream automation ─────────────────────────────────────────────────────
+LIVESTREAM_BASE_URL = os.environ.get("LIVESTREAM_BASE_URL", "http://127.0.0.1:8000")
+LIVESTREAM_TARGET_LEAGUE_ID = int(os.environ.get("LIVESTREAM_TARGET_LEAGUE_ID", "1"))
+LIVESTREAM_TARGET_SEASON = int(os.environ.get("LIVESTREAM_TARGET_SEASON", "2026"))
+LIVESTREAM_POLL_SECONDS = int(os.environ.get("LIVESTREAM_POLL_SECONDS", "30"))
+LIVESTREAM_PREMATCH_LEAD_SECONDS = int(os.environ.get("LIVESTREAM_PREMATCH_LEAD_SECONDS", "900"))
+LIVESTREAM_POSTMATCH_GRACE_SECONDS = int(os.environ.get("LIVESTREAM_POSTMATCH_GRACE_SECONDS", "180"))
+LIVESTREAM_STATE_FILE = os.environ.get("LIVESTREAM_STATE_FILE", str(TEMP_DIR / "livestream_state.json"))
+LIVESTREAM_CONTROLLER_STATE_FILE = os.environ.get(
+    "LIVESTREAM_CONTROLLER_STATE_FILE",
+    str(TEMP_DIR / "livestream_controller_state.json"),
+)
+LIVESTREAM_LOG_DIR = os.environ.get("LIVESTREAM_LOG_DIR", str(TEMP_DIR / "livestream"))
+
+# Headless encoder on Hetzner/Linux
+LIVESTREAM_FRAME_WIDTH = int(os.environ.get("LIVESTREAM_FRAME_WIDTH", "1080"))
+LIVESTREAM_FRAME_HEIGHT = int(os.environ.get("LIVESTREAM_FRAME_HEIGHT", "1920"))
+LIVESTREAM_FRAME_RATE = int(os.environ.get("LIVESTREAM_FRAME_RATE", "30"))
+LIVESTREAM_DISPLAY = os.environ.get("LIVESTREAM_DISPLAY", ":99")
+LIVESTREAM_CHROMIUM_BIN = os.environ.get("LIVESTREAM_CHROMIUM_BIN", "chromium")
+LIVESTREAM_FFMPEG_BIN = os.environ.get("LIVESTREAM_FFMPEG_BIN", "ffmpeg")
+LIVESTREAM_XVFB_BIN = os.environ.get("LIVESTREAM_XVFB_BIN", "Xvfb")
+LIVESTREAM_AUDIO_FILE = os.environ.get("LIVESTREAM_AUDIO_FILE", "")
+LIVESTREAM_VIDEO_BITRATE = os.environ.get("LIVESTREAM_VIDEO_BITRATE", "4500k")
+LIVESTREAM_AUDIO_BITRATE = os.environ.get("LIVESTREAM_AUDIO_BITRATE", "128k")
+LIVESTREAM_FFMPEG_PRESET = os.environ.get("LIVESTREAM_FFMPEG_PRESET", "veryfast")
+LIVESTREAM_STREAM_KEY = os.environ.get("LIVESTREAM_STREAM_KEY", "")
 
 # ── Google Drive ──────────────────────────────────────────────────────────────
 GDRIVE_REFRESH_TOKEN = os.environ.get("GDRIVE_REFRESH_TOKEN", "")
