@@ -29,12 +29,22 @@ def _youtube():
 
 
 def _iso8601(value: str | datetime | None) -> str:
+    now = datetime.now(timezone.utc)
+    minimum_start = now + timedelta(minutes=2)
     if isinstance(value, datetime):
         dt = value.astimezone(timezone.utc)
+        if dt < minimum_start:
+            dt = minimum_start
         return dt.replace(microsecond=0).isoformat().replace("+00:00", "Z")
     if isinstance(value, str) and value.strip():
-        return value.strip()
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        try:
+            dt = datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
+        except ValueError:
+            return minimum_start.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        if dt < minimum_start:
+            dt = minimum_start
+        return dt.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return minimum_start.replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _normalise_privacy(value: str) -> str:
