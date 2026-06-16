@@ -552,7 +552,7 @@ _SCOREBOARD_HTML = r"""
     }
     .events-card {
       width: 960px;
-      height: 308px;
+      height: 360px;
       margin: 14px auto 0;
       border-top-color: rgba(255,45,45,.98);
       border-bottom-color: rgba(255,45,45,.98);
@@ -669,7 +669,7 @@ _SCOREBOARD_HTML = r"""
     .minute { color: var(--accent); font-weight: 800; }
     .empty-line { color: var(--muted); }
     .events-body {
-      height: 238px;
+      height: 300px;
       padding: 4px 24px 8px 42px;
       display: grid;
       gap: 0;
