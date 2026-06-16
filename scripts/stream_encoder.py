@@ -101,6 +101,8 @@ def _chromium_command(frame_url: str) -> list[str]:
         "--start-fullscreen",
         "--window-position=0,0",
         f"--window-size={settings.LIVESTREAM_FRAME_WIDTH},{settings.LIVESTREAM_FRAME_HEIGHT}",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
         "--disable-infobars",
         "--no-first-run",
         "--no-default-browser-check",
