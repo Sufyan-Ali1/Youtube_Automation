@@ -18,6 +18,7 @@ from publish.livestream import (
     LiveStreamError,
     bind_broadcast_to_stream,
     create_broadcast,
+    delete_broadcast,
     find_reusable_broadcast,
     get_broadcast,
     stream_health,
@@ -185,6 +186,19 @@ def _transition_live(state: ControllerState) -> ControllerState:
 
 def _complete_broadcast(state: ControllerState) -> bool:
     details = get_broadcast(state.broadcast_id)
+    if details.life_cycle_status == "complete":
+        stop_encoder()
+        _clear_state()
+        return True
+    if details.life_cycle_status in {"created", "ready"}:
+        if is_running():
+            stop_encoder()
+        try:
+            delete_broadcast(state.broadcast_id)
+        except Exception as exc:
+            logger.warning("Could not delete non-started broadcast %s: %s", state.broadcast_id, exc)
+        _clear_state()
+        return True
     if details.life_cycle_status != "complete":
         details = transition_broadcast(state.broadcast_id, "complete")
     if details.life_cycle_status != "complete":

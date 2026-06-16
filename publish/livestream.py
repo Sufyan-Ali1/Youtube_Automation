@@ -213,6 +213,11 @@ def transition_broadcast(broadcast_id: str, status: str) -> BroadcastRef:
     )
 
 
+def delete_broadcast(broadcast_id: str) -> None:
+    _youtube().liveBroadcasts().delete(id=broadcast_id).execute()
+    logger.info("YouTube broadcast deleted: %s", broadcast_id)
+
+
 def stream_health(stream_id: str | None = None) -> str:
     stream = get_stream(stream_id)
     status = ((stream.get("status") or {}).get("streamStatus") or "").lower()
