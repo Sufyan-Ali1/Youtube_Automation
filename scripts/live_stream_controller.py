@@ -222,7 +222,7 @@ def _handle_fixture(state: ControllerState | None, fixture: dict[str, Any]) -> C
     return state
 
 
-def run_controller(*, once: bool = False) -> None:
+def run_controller(*, once: bool = False, fixture_id_override: int | None = None) -> None:
     _setup_logging()
     logger.info(
         "Starting livestream controller for league=%s season=%s poll=%ss",
@@ -231,12 +231,17 @@ def run_controller(*, once: bool = False) -> None:
         settings.LIVESTREAM_POLL_SECONDS,
     )
     state = _load_state()
+    override_fixture_id = fixture_id_override or (settings.LIVESTREAM_FIXTURE_ID or None)
+    if override_fixture_id:
+        logger.info("Fixture override enabled: fixture_id=%s", override_fixture_id)
 
     while True:
         try:
             now = datetime.now(UTC)
             fixtures = _load_today_fixtures()
-            if state and state.fixture_id:
+            if override_fixture_id:
+                fixture = _api().fixture(int(override_fixture_id))
+            elif state and state.fixture_id:
                 fixture = _api().fixture(state.fixture_id)
             else:
                 fixture = _select_candidate(fixtures, now)
@@ -264,8 +269,9 @@ def run_controller(*, once: bool = False) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Automate FIFA World Cup livestream start/stop.")
     parser.add_argument("--once", action="store_true", help="Run one controller cycle and exit.")
+    parser.add_argument("--fixture-id", type=int, help="Force one specific fixture ID for testing/override.")
     args = parser.parse_args()
-    run_controller(once=args.once)
+    run_controller(once=args.once, fixture_id_override=args.fixture_id)
 
 
 if __name__ == "__main__":

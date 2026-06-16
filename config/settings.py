@@ -53,6 +53,7 @@ LIVE_SCORE_TIMEZONE     = os.environ.get("LIVE_SCORE_TIMEZONE", "UTC")
 
 # ── Livestream automation ─────────────────────────────────────────────────────
 LIVESTREAM_BASE_URL = os.environ.get("LIVESTREAM_BASE_URL", "http://127.0.0.1:8000")
+LIVESTREAM_FIXTURE_ID = int(os.environ.get("LIVESTREAM_FIXTURE_ID", "0"))
 LIVESTREAM_TARGET_LEAGUE_ID = int(os.environ.get("LIVESTREAM_TARGET_LEAGUE_ID", "1"))
 LIVESTREAM_TARGET_SEASON = int(os.environ.get("LIVESTREAM_TARGET_SEASON", "2026"))
 LIVESTREAM_POLL_SECONDS = int(os.environ.get("LIVESTREAM_POLL_SECONDS", "30"))
