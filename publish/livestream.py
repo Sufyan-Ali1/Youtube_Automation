@@ -54,6 +54,23 @@ def _normalise_privacy(value: str) -> str:
     return privacy
 
 
+def _normalise_tags(tags: list[str] | tuple[str, ...] | None) -> list[str]:
+    if not tags:
+        return []
+    cleaned: list[str] = []
+    seen: set[str] = set()
+    for raw in tags:
+        tag = str(raw or "").strip()
+        if not tag:
+            continue
+        key = tag.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        cleaned.append(tag[:30])
+    return cleaned[:15]
+
+
 def get_stream(stream_id: str | None = None) -> dict[str, Any]:
     target_stream_id = (stream_id or settings.YOUTUBE_LIVE_STREAM_ID).strip()
     if not target_stream_id:
@@ -144,6 +161,7 @@ def create_broadcast(
     start_time: str | datetime | None,
     privacy_status: str | None = None,
     category_id: str | None = None,
+    tags: list[str] | tuple[str, ...] | None = None,
 ) -> BroadcastRef:
     body = {
         "snippet": {
@@ -151,6 +169,7 @@ def create_broadcast(
             "description": description,
             "scheduledStartTime": _iso8601(start_time),
             "categoryId": category_id or settings.YOUTUBE_LIVE_CATEGORY_ID,
+            "tags": _normalise_tags(tags),
         },
         "status": {
             "privacyStatus": _normalise_privacy(privacy_status or settings.YOUTUBE_LIVE_PRIVACY_STATUS),

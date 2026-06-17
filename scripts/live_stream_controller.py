@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import re
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -103,14 +104,51 @@ def _fixture_description(fixture: dict[str, Any]) -> str:
     venue = fixture["venue"]["name"] or "Venue TBC"
     round_name = fixture["league"]["round"] or "World Cup"
     kickoff = fixture["date"]
+    team_tags = " ".join(filter(None, (_team_hashtag(home), _team_hashtag(away))))
+    hashtags = f"#fifaworldcup2026 #fifaworldcup #worldcup2026 #livestream #livefootball #livescore {team_tags}".strip()
     return (
         f"Automated live scoreboard stream for {home} vs {away}.\n\n"
         f"Competition: {fixture['league']['name']}\n"
         f"Round: {round_name}\n"
         f"Venue: {venue}\n"
         f"Kickoff: {kickoff}\n\n"
-        f"{settings.BRAND_NAME} - {settings.BRAND_TAGLINE}"
+        f"{settings.BRAND_NAME} - {settings.BRAND_TAGLINE}\n\n"
+        f"{hashtags}"
     )
+
+
+def _team_hashtag(name: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9]+", "", str(name or "").strip())
+    return f"#{cleaned}" if cleaned else ""
+
+
+def _fixture_tags(fixture: dict[str, Any]) -> list[str]:
+    home = fixture["teams"]["home"]["name"]
+    away = fixture["teams"]["away"]["name"]
+    round_name = fixture["league"]["round"] or "World Cup"
+    brand = (settings.BRAND_NAME or "").strip()
+    tags = [
+        "fifaworldcup2026",
+        "fifa",
+        "fifaworldcup",
+        "worldcup2026",
+        f"{home} vs {away}",
+        home,
+        away,
+        "footballlive",
+        "livescore",
+        "worldcuplive",
+        "livestream",
+        "livestreaming",
+        "livefootball",
+        "livefootballmatchtoday",
+        "footballscoreboard",
+        "matchstats",
+        round_name,
+    ]
+    if brand:
+        tags.append(brand)
+    return tags
 
 
 def _select_candidate(fixtures: list[dict[str, Any]], now: datetime) -> dict[str, Any] | None:
@@ -164,6 +202,7 @@ def _ensure_broadcast(state: ControllerState | None, fixture: dict[str, Any]) ->
             title=title,
             description=_fixture_description(fixture),
             start_time=start_time,
+            tags=_fixture_tags(fixture),
         )
     if not broadcast.bound_stream_id:
         broadcast = bind_broadcast_to_stream(broadcast.broadcast_id)
