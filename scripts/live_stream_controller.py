@@ -244,6 +244,38 @@ def _transition_live(state: ControllerState) -> ControllerState:
     return state
 
 
+def _ensure_live_encoder(state: ControllerState, fixture: dict[str, Any]) -> ControllerState:
+    short = (fixture["status"]["short"] or "").upper()
+    if short not in LIVE_STATUSES or not state.live_started:
+        return state
+    if is_running():
+        return state
+
+    logger.warning(
+        "Encoder stack is not healthy during live fixture %s (%s); restarting encoder",
+        fixture["id"],
+        short,
+    )
+    stop_encoder()
+    start_encoder(state.fixture_id)
+
+    details = get_broadcast(state.broadcast_id)
+    if details.life_cycle_status == "live":
+        return state
+    if details.life_cycle_status == "testing":
+        transition_broadcast(state.broadcast_id, "live")
+        return state
+    if details.life_cycle_status == "complete":
+        raise LiveStreamError(f"Broadcast {state.broadcast_id} completed while fixture is still live")
+
+    try:
+        transition_broadcast(state.broadcast_id, "testing")
+    except Exception as exc:
+        logger.warning("Broadcast testing transition failed after encoder restart: %s", exc)
+    transition_broadcast(state.broadcast_id, "live")
+    return state
+
+
 def _complete_broadcast(state: ControllerState) -> bool:
     details = get_broadcast(state.broadcast_id)
     if details.life_cycle_status == "complete":
@@ -277,6 +309,7 @@ def _handle_fixture(state: ControllerState | None, fixture: dict[str, Any]) -> C
     if short in LIVE_STATUSES and not state.live_started:
         logger.info("Fixture %s is live (%s); starting broadcast", fixture["id"], short)
         state = _transition_live(state)
+    state = _ensure_live_encoder(state, fixture)
 
     if short in FINISHED_STATUSES:
         now_ts = int(time.time())

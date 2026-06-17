@@ -103,6 +103,10 @@ def _chromium_command(frame_url: str) -> list[str]:
         f"--window-size={settings.LIVESTREAM_FRAME_WIDTH},{settings.LIVESTREAM_FRAME_HEIGHT}",
         "--no-sandbox",
         "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--disable-extensions",
+        "--disable-background-networking",
+        "--disable-component-update",
         "--disable-infobars",
         "--no-first-run",
         "--no-default-browser-check",
@@ -165,6 +169,9 @@ def start_encoder(fixture_id: int) -> EncoderState:
         raise EncoderError(
             f"Encoder already running for fixture {existing.fixture_id}; stop it before starting fixture {fixture_id}"
         )
+    if existing:
+        logger.warning("Found stale/partial encoder state for fixture %s; cleaning it up before restart", existing.fixture_id)
+        stop_encoder()
 
     frame_url = _frame_url(fixture_id)
     display = settings.LIVESTREAM_DISPLAY
