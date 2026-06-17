@@ -428,10 +428,12 @@ _SCOREBOARD_HTML = r"""
     .scoreboard {
       margin-top: 48px;
       display: grid;
-      grid-template-columns: 240px 1fr 240px;
+      grid-template-columns: minmax(0, 250px) minmax(0, 488px) minmax(0, 250px);
       align-items: start;
+      justify-content: space-between;
       gap: 10px;
       transform: translateX(0);
+      overflow: hidden;
     }
     .team-block {
       display: flex;
@@ -443,7 +445,7 @@ _SCOREBOARD_HTML = r"""
       min-width: 0;
     }
     .team-logo-slot {
-      width: 220px;
+      width: 210px;
       height: 170px;
       display: flex;
       align-items: flex-end;
@@ -476,6 +478,9 @@ _SCOREBOARD_HTML = r"""
     .center-score {
       text-align: center;
       padding-top: 18px;
+      min-width: 0;
+      width: 100%;
+      overflow: hidden;
     }
     .scoreline {
       display: flex;
@@ -503,6 +508,7 @@ _SCOREBOARD_HTML = r"""
       text-shadow: none;
       white-space: nowrap;
       overflow: hidden;
+      width: 100%;
     }
     .minute-live { color: var(--accent); }
     .minute-live.is-finished {
@@ -552,7 +558,7 @@ _SCOREBOARD_HTML = r"""
     }
     .events-card {
       width: 960px;
-      height: 360px;
+      height: 340px;
       margin: 14px auto 0;
       border-top-color: rgba(255,45,45,.98);
       border-bottom-color: rgba(255,45,45,.98);
@@ -560,7 +566,7 @@ _SCOREBOARD_HTML = r"""
     }
     .stats-card {
       width: 960px;
-      min-height: 196px;
+      height: 244px;
       margin: 14px auto 0;
       border-top-color: rgba(255,45,45,.98);
       border-bottom-color: rgba(255,45,45,.98);
@@ -619,7 +625,8 @@ _SCOREBOARD_HTML = r"""
     .scorer-side {
       display: grid;
       gap: 10px;
-      transform: translate(16px, 6px);
+      transform: translate(0, 6px);
+      min-width: 0;
     }
     .scorer-team {
       display: flex;
@@ -644,32 +651,43 @@ _SCOREBOARD_HTML = r"""
     .scorer-list {
       display: grid;
       gap: 8px;
-      padding-left: 18px;
+      padding-left: 8px;
       font-size: 22px;
       text-shadow: none;
       -webkit-font-smoothing: antialiased;
       text-rendering: geometricPrecision;
+      min-width: 0;
     }
     .scorer-list.two-col {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: 22px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+      column-gap: 12px;
       align-items: start;
+      max-width: 100%;
     }
     .scorer-col {
       display: grid;
       gap: 8px;
       align-content: start;
+      min-width: 0;
     }
     .scorer-row {
       display: flex;
       align-items: center;
       gap: 10px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .scorer-row span:nth-child(2) {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .ball { color: var(--accent); }
     .minute { color: var(--accent); font-weight: 800; }
     .empty-line { color: var(--muted); }
     .events-body {
-      height: 300px;
+      height: 280px;
       padding: 4px 24px 8px 42px;
       display: grid;
       gap: 0;
@@ -698,8 +716,8 @@ _SCOREBOARD_HTML = r"""
     .event-row.spacious .event-minute { font-size: 25px; }
     .event-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .stats-body {
-      min-height: 132px;
-      padding: 6px 26px 16px;
+      height: 176px;
+      padding: 6px 26px 10px;
       display: grid;
       gap: 8px;
       align-content: start;
@@ -1069,7 +1087,7 @@ _SCOREBOARD_HTML = r"""
       if (!el) return;
       let size = 24;
       el.style.fontSize = `${size}px`;
-      while (el.scrollWidth > el.clientWidth && size > 16) {
+      while (el.scrollWidth > el.clientWidth && size > 12) {
         size -= 1;
         el.style.fontSize = `${size}px`;
       }
@@ -1225,7 +1243,9 @@ _SCOREBOARD_HTML = r"""
         ['Yellow Cards', homeStats.yellow_cards, awayStats.yellow_cards, false],
         ['Red Cards', homeStats.red_cards, awayStats.red_cards, false],
       ];
-      const available = statRows.filter(row => statValue(row[1]) !== null || statValue(row[2]) !== null);
+      const available = statRows
+        .filter(row => statValue(row[1]) !== null || statValue(row[2]) !== null)
+        .slice(0, 5);
       if (!available.length) return '<div class="event-row"><div class="event-icon">•</div><div class="event-minute">--</div><div class="event-text">Stats unavailable</div></div>';
       return available.map(row => {
         const homeValue = statValue(row[1]) ?? '-';
