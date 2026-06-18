@@ -7,7 +7,7 @@ Start the full system:
 What this does:
   1. Runs an immediate collector poll on startup
   2. Schedules collector (RSS + Google Alerts → DB) every hour
-  3. Schedules daily video generation once per day (default 8 PM UTC)
+  3. Schedules daily video generation at configured UTC time slots
 
 To run just one collector poll manually (useful for testing):
     python main.py --once
@@ -63,14 +63,14 @@ def main() -> None:
         misfire_grace_time=60,
     )
 
-    # Job 2: generate daily multi-story video twice per day (7 AM + 7 PM UTC)
-    for hour in settings.DAILY_VIDEO_HOURS_UTC:
-        slot = "am" if hour < 12 else "pm"
+    # Job 2: generate daily multi-story video at configured UTC slots
+    for hour, minute in settings.DAILY_VIDEO_SLOTS_UTC:
+        slot = f"{hour:02d}{minute:02d}"
         scheduler.add_job(
             run_daily_video,
-            trigger=CronTrigger(hour=hour, minute=0, timezone="UTC"),
+            trigger=CronTrigger(hour=hour, minute=minute, timezone="UTC"),
             id=f"daily_video_{slot}",
-            name=f"Daily Video Generator ({slot.upper()})",
+            name=f"Daily Video Generator ({hour:02d}:{minute:02d} UTC)",
             max_instances=1,
             coalesce=True,
             misfire_grace_time=3600,
@@ -80,7 +80,7 @@ def main() -> None:
         "Football AutoNews Engine started. Collector every %ds, "
         "daily video at %s UTC. Press Ctrl+C to stop.",
         settings.POLL_INTERVAL_RSS,
-        " and ".join(f"{h:02d}:00" for h in settings.DAILY_VIDEO_HOURS_UTC),
+        " and ".join(f"{hour:02d}:{minute:02d}" for hour, minute in settings.DAILY_VIDEO_SLOTS_UTC),
     )
 
     try:

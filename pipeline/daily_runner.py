@@ -1,5 +1,5 @@
 """
-Daily Runner — Job 2 (once per day, default 8 PM UTC).
+Daily Runner — Job 2 (twice per day at 08:30 UTC and 18:30 UTC).
 
 Picks the top 3-5 highest-ranked pending articles from the DB,
 verifies their classification via a 2nd Groq pass (skipping articles
@@ -186,7 +186,8 @@ def _select_stories(max_age_hours: int = 12) -> list[sqlite3.Row]:
 
 def run_daily_video() -> None:
     """Generate a daily multi-story video from top verified pending articles.
-    Runs twice per day — slot is determined from current UTC hour:
+    Runs twice per day — morning slot at 08:30 UTC and evening slot at 18:30 UTC.
+    Slot key remains:
       00:00–11:59 UTC → 'am'  (key: 2026-06-01_am)
       12:00–23:59 UTC → 'pm'  (key: 2026-06-01_pm)
     """
